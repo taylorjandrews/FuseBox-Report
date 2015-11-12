@@ -1,0 +1,16 @@
+# Editor Cruft
+*~
+\#*
+.#*
+
+# LaTeX Cruft
+*.dvi
+*.aux
+*.log
+*.blg
+*.bbl
+*.out
+*-eps-converted-to.pdf
+
+# Output PDF
+report.pdf
