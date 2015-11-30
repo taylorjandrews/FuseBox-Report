@@ -35,37 +35,65 @@
 \clubpenalty = 10000
 \widowpenalty = 10000
 
+% Variable
+\newcommand{\appname}{Dropfuse }
+
 % Start
 \begin{document}
 
-\title{Example Document}
-% Subtitles aren't supported in the ``article'' document class, but if
-% they were, you could add one via the following line.
-%\subtitle{Example Document}
+\title{\appname}
 
-\author{Example Author}
+\author{Taylor Andrews}
 
 \maketitle
 
 \begin{abstract}
-This is an example \LaTeX document. This is its abstract. Give the
-reader an overview of the document here.
+Security in the digital age is an ever evolving problem.
+Services are doing their very best to protect sensitive data. 
+However, in the face of social engineering attacks and other 
+exploits, it can be on the user to go the extra step to make sure
+their data is safe. \appname aims to simplify this by providing a
+transparent layer of security between the end user and Dropbox. Files
+that pass through \appname are encrypted when uploaded to Dropbox. 
+Thus, using \appname guarantees that data is protected even if 
+Dropbox is compromised. Secure key storage for \appname is accomplished using
+ Custos, a ``Secret Storage as a Service'' (SSaaS). 
+This paper will lay out the design and 
+implementation of \appname as well as future goals for the project.    
 \end{abstract}
 
-\section{Section 1}
-\label{sec:section1}
+\section{Introduction}
+\label{sec:intro}
 
 This is an example section.
 
-\subsection{Subsection A}
-\label{sec:section1A}
+\subsection{Goals}
+\label{sec:goals}
 
 This is an example subsection
 
-\section{Section 2}
-\label{sec:section2}
+\section{Design}
+\label{sec:design}
+
+design section
+
+\section{Implementation}
+\label{sec:implementation}
 
 This is another section.
+
+\section{Evaluation}
+\label{sec:eval}
+
+eval things!
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+conclude the paper
+
+\section{examples}
+\label{sec:ex}
 
 \noindent
 This is a citation~\cite{exampleref1}.
