@@ -79,7 +79,10 @@ they could be the target of an attack. The idea of keeping things safe
 is nothing complicated. However, to the layman, the intricacies of
 actually protecting data are somewhat out of reach. This problem
 becomes compounded when a single person wants to safely share data
-with trusted partners.   
+with trusted partners. Fortunately, part of the solution already exits.
+Custos, a SSaaS, provides a flexible means of storing and
+retrieving secrets CITATION?. Leveraging Custos allows \appname to 
+encrypt and authenticate in conjunction with cloud based services.      
 \par 
 Accessible security is the aim of \appnameWOspace. This starts with
 creating a client that's easy to understand. 
@@ -89,12 +92,21 @@ creating a client that's easy to understand.
 \subsection{Goals}
 \label{sec:goals}
 \appname was created to be a simple and transparent security
-measure. Easy to setup, easy to use. 
+measure. Easy to setup, easy to use.
+\par {\bf Transparency:} Dropbox is a very convenient application to
+use. Put files in, get files out. The existing desktop application
+allows for seamlessly uploading and downloading files CITATION?. The end user
+gets to take advantage of all the nice features of Dropbox at little
+to no effort on their end. \appname is built to keep this same 
+seamless feel while preserving the features of Dropbox. meanwhile behind the
+scenes encryption, decryption, and authentication work together to
+secure the data.     
+\par {\bf Simplicity:} 
 
 \section{Design}
 \label{sec:design}
 
-design section
+Design Section
 
 \section{Implementation}
 \label{sec:implementation}
@@ -107,7 +119,7 @@ This is another section.
 \section{Conclusion}
 \label{sec:conclusion}
 
-conclude the paper
+Where do we go from here?
 
 \section{Examples}
 \label{sec:ex}
