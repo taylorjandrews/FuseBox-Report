@@ -59,15 +59,14 @@ sharing data between trusted people and devices. Take Dropbox for
 example CITATION?. It supports many sharing features, so users can't just
 encrypt and decrypt their files on a single computer. A more robust,
 and shareable, way to encrypt files is needed. 
-\par \appname aims to be a solution to this problem by providing a
+\appname aims to be a solution to this problem by providing a
 transparent layer of security between the end user and Dropbox. Files
 that pass through \appname are encrypted when uploaded to Dropbox. 
-Thus, using the client guarantees that data is protected even if 
-Dropbox is compromised. This fulfills the need for safety. The need
-for shareability
-is accomplished using Custos, a ``Secret Storage as a Service''
-(SSaaS) platform CITATION?. Custos allows for key sharing amongst
-people and computers. This paper will lay out
+Encryption, decryption, and authentication are all supported by \appnameWOspace.
+%Shareability is provided using Custos, a ``Secret Storage as a Service''
+%(SSaaS) platform CITATION?. Custos allows for key sharing amongst
+%people and computers. 
+This paper will lay out
 the design and implementation of \appnameWOspace, as well as 
 future goals for the project.    
 \end{abstract}
@@ -79,15 +78,24 @@ they could be the target of an attack. The idea of keeping things safe
 is nothing complicated. However, to the layman, the intricacies of
 actually protecting data are somewhat out of reach. This problem
 becomes compounded when a single person wants to safely share data
-with trusted partners. Fortunately, part of the solution already exits.
+with trusted partners. Cloud-based products, like Dropbox, are built
+on the ability to share and transfer data. How can users protect their
+data while still being able to normally use Dropbox? 
+\par Fortunately, part of the solution to this problem already exits.
 Custos, a SSaaS, provides a flexible means of storing and
-retrieving secrets CITATION?. Leveraging Custos allows \appname to 
-encrypt and authenticate in conjunction with cloud based services.      
-\par 
-Accessible security is the aim of \appnameWOspace. This starts with
-creating a client that's easy to understand. 
-\par
-\appname is the product of many different libraries. 
+retrieving secrets CITATION?. The SSaaS model supports the features of
+Dropbox that \appname needs to interact with. Leveraging Custos allows \appname to 
+authenticate in conjunction with cloud based services. The user's
+identity can be confirmed, and the appropriate key retrieved, on any number
+of platforms. 
+\par Getting a key in this manner relieves the problems associated
+with using the cloud. The user's data, however, still needs to be
+protected. \appname aims to accomplish this as transparently as
+possible. To the end user, it appears that they are just normally
+interacting with their Dropbox. They can read, write, and create
+files. These files, from the perspective of Dropbox, are actually
+encrypted. If Dropbox is compromised data that passes through \appname
+will not be.    
 
 \subsection{Goals}
 \label{sec:goals}
