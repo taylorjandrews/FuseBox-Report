@@ -2,7 +2,8 @@
 %
 % Fall 2015
 %
-% Andy Sayler
+% Created by: Andy Sayler
+% Modified by: Taylor Andrews
 
 \documentclass[11pt,twocolumn,letterpaper]{article}
 
@@ -36,7 +37,8 @@
 \widowpenalty = 10000
 
 % Variable
-\newcommand{\appname}{Dropfuse }
+\newcommand{\appname}{Custos FuseBox }
+\newcommand{\appnameWOspace}{Custos FuseBox}
 
 % Start
 \begin{document}
@@ -50,27 +52,44 @@
 \begin{abstract}
 Security in the digital age is an ever evolving problem.
 Services are doing their very best to protect sensitive data. 
-However, in the face of social engineering attacks and other 
+However, in the face of social engineering attacks and other more technical
 exploits, it can be on the user to go the extra step to make sure
-their data is safe. \appname aims to simplify this by providing a
+their data is safe. Safety, however, should not come at the cost of
+sharing data between trusted people and devices. Take Dropbox for
+example CITATION?. It supports many sharing features, so users can't just
+encrypt and decrypt their files on a single computer. A more robust,
+and shareable, way to encrypt files is needed. 
+\par \appname aims to be a solution to this problem by providing a
 transparent layer of security between the end user and Dropbox. Files
 that pass through \appname are encrypted when uploaded to Dropbox. 
-Thus, using \appname guarantees that data is protected even if 
-Dropbox is compromised. Secure key storage for \appname is accomplished using
- Custos, a ``Secret Storage as a Service'' (SSaaS). 
-This paper will lay out the design and 
-implementation of \appname as well as future goals for the project.    
+Thus, using the client guarantees that data is protected even if 
+Dropbox is compromised. This fulfills the need for safety. The need
+for shareability
+is accomplished using Custos, a ``Secret Storage as a Service''
+(SSaaS) platform CITATION?. Custos allows for key sharing amongst
+people and computers. This paper will lay out
+the design and implementation of \appnameWOspace, as well as 
+future goals for the project.    
 \end{abstract}
 
 \section{Introduction}
 \label{sec:intro}
-
-This is an example section.
+Unsecured data is a gamble, a risk. No one wants to think that
+they could be the target of an attack. The idea of keeping things safe
+is nothing complicated. However, to the layman, the intricacies of
+actually protecting data are somewhat out of reach. This problem
+becomes compounded when a single person wants to safely share data
+with trusted partners.   
+\par 
+Accessible security is the aim of \appnameWOspace. This starts with
+creating a client that's easy to understand. 
+\par
+\appname is the product of many different libraries. 
 
 \subsection{Goals}
 \label{sec:goals}
-
-This is an example subsection
+\appname was created to be a simple and transparent security
+measure. Easy to setup, easy to use. 
 
 \section{Design}
 \label{sec:design}
@@ -82,17 +101,15 @@ design section
 
 This is another section.
 
-\section{Evaluation}
-\label{sec:eval}
-
-eval things!
+%\section{Evaluation}
+%\label{sec:eval}
 
 \section{Conclusion}
 \label{sec:conclusion}
 
 conclude the paper
 
-\section{examples}
+\section{Examples}
 \label{sec:ex}
 
 \noindent
