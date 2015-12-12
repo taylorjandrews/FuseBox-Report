@@ -1,4 +1,2 @@
-Template starting point
-
-Created By: Andy Sayler
-Modified By: Taylor Andrews
+FuseBox is an encrypted file system running on top of Dropbox. This report details the functionality of FuseBox.
+By: Taylor Andrews
