@@ -58,7 +58,7 @@ However, in the face of social engineering attacks and other more technical
 exploits, it can be on the user to go the extra step to make sure
 their data is safe. Safety, however, should not come at the cost of
 sharing data between trusted people and devices. Take Dropbox for
-example \cite{exampleref1}. It supports many sharing features, so users can't just
+example~\cite{dropbox}. It supports many sharing features, so users can't just
 encrypt and decrypt their files on a single computer. A more robust,
 and shareable, way to encrypt files is needed. 
 \appname aims to be a solution to this problem by providing a
@@ -86,7 +86,7 @@ data while still being able to normally use Dropbox?
 \par Fortunately, part of the solution to this problem already exits.
 \custosWOspace, a ``Secret Storage as a Service'' (SSaaS), 
 provides a flexible means of storing and
-retrieving secrets \cite{exampleref1}. The SSaaS model supports the features of
+retrieving secrets~\cite{custostrios}. The SSaaS model supports the features of
 Dropbox that \appname needs to interact with. Leveraging \custos allows \appname to 
 authenticate in conjunction with cloud based services. The user's
 identity can be confirmed, and the appropriate key retrieved, on any number
@@ -106,7 +106,7 @@ will not be.
 \appname was created with two primary goals: transparency and consistency. 
 \par {\bf Transparency:} Dropbox is a very convenient application to
 use. Put files in, get files out. The existing desktop application
-allows for seamlessly uploading and downloading files \cite{exampleref1}. The end user
+allows for seamlessly uploading and downloading files~\cite{dropboxclient}. The end user
 gets to take advantage of all the nice features of Dropbox at little
 to no effort on their end. \appname is built to keep this same 
 seamless feel while preserving the features of Dropbox. Meanwhile behind the
@@ -135,20 +135,32 @@ authentication so that the user may access their key.
 
 \subsection{File System}
 \label{sec:fs}
-*mounting file system as (opposed to webclient?)
-   transparency and usability
-   allows the user to control when fusebox is active
-*get dropbox oauth apriori
-   usability
-   convenient reuse
-*dropbox metadata
-   fetched in getattr
-   file obtained from dropbox in open
-       why this over read? over write?
-   enc/dec handled in read/write/create
-   file pushed to dropbox in release
-       why this over read? over write?
-
+\appname is a transparent and consistent file system. The major design
+decisions for the file system include: how to mount the file system on
+the user's computer and when the interactions with Dropbox should
+occur. 
+\par Mounting the file system is a necessary step to connect the user
+with \appnameWOspace. I chose to give user control over when the file
+system is mounted and when it is not.  
+\par The file system connects to Dropbox via an oauth token. The user must
+generate this token with their account information. In order to make
+\appname more usable in the long-term, this oauth token need only be
+constructed by the user one time. Then, the file system, once mounted,
+just continues to use the specified oauth token until it expires or is
+revoked by the user. 
+\par Interaction with Dropbox is restricted to three simple
+operations: downloading a file, uploading a file, and reading Dropbox
+file metadata. The file system must use these operations in
+conjunction with normal file operations such as read and write. Some
+aspects of this were simple. The Dropbox metadata is obtained when the
+file system reads the attributes of the file. Others were less so.
+\par The relevant file system operations are read, write, open, and
+release. The decision boils down to whether files are downloaded in
+open or read, and whether they are uploaded in write or create. The
+current implementation is simpler. It downloads in open and uploads in
+release. In the future, I would like to move the design to download in
+read and upload in write. This allows for an approach more geared at
+streaming files. 
 
 \subsection{Encryption}
 \label{sec:enc}
@@ -157,9 +169,9 @@ Dropbox client. The selection of a cryptographic algorithm, as well as
 any additional features of encryption, was a key design choice. What
 algorithm adheres best to the core goals of \appnameWOspace? Based on
 this criteria, I choose an AES stream cipher over an AES block
-cipher. More specifically, AES in CTR mode.  
+cipher. More specifically, AES in CTR mode~\cite{AESCTR}.  
 \par A stream cipher is ideal for \appname because it has better
-performance for random access \cite{exampleref1}. Since the AES block 
+performance for random access. Since the AES block 
 cipher relies on a feedback loop, it must always decrypt and encrypt
 the whole file at a time. \appname seeks to provide consistent
 performance for files large and small. A block cipher would create
@@ -204,74 +216,8 @@ Dropbox API
 
 Where do we go from here?
 
-\section{Examples}
-\label{sec:ex}
-
 \noindent
-This is a citation~\cite{exampleref1}.
-
-% The tilde (~) in the previous sentence is optional, and just helps
-% to insure citations and references don't wind up on a new line
-% separated from the text they're attached to.
-
-% noindent can be used to prevent indentation on single-line paragraphs.
-
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width=\columnwidth]{./figs/pdf/examplefig1.pdf}
-  \caption{Example Figure 1}
-  \label{fig:example1}
-\end{figure}
-
-\noindent
-Figure~\ref{fig:example1} is an example figure. The proceeding
-sentence contains a reference to it.
-
-\noindent
-Sometimes you want thing in {\bf bold}.
-
-\noindent
-Or in {\em italics}.
-
-\noindent
-Or in \texttt{type-write font}.
-
-\noindent
-Sometime you need to do some math: $9/3=3$.
-
-\noindent
-Or ``a quote.''
-
-\noindent
-Or add a bullet list:
-
-\begin{packed_item}
-\item Item A
-\item Item B
-\item Item C
-\end{packed_item}
-
-\noindent
-Or a numbered list:
-
-\begin{packed_enum}
-\item Item 1
-\item Item 2
-\item Item 3
-\end{packed_enum}
-
-\noindent
-Or a definitions list:
-
-\begin{packed_desc}
-\item[Item I:] This is item 1 
-\item[Item II:] This is item 2
-\item[Item III:] This is item 3
-\end{packed_desc}
-
-% Note: The ``packed'' variants of the above items are my own and are
-% defined in macros.tex. They are more tightly spaced versions of the
-% standard LaTeX enumerate, itemize, and description environments.
+make a paragraph without indenting!
 
 \bibliographystyle{acm}
 \bibliography{refs}
