@@ -1,9 +1,8 @@
-% Latex Template
+% FuseBox Report
 %
 % Fall 2015
 %
-% Created by: Andy Sayler
-% Modified by: Taylor Andrews
+% By: Taylor Andrews
 
 \documentclass[11pt,twocolumn,letterpaper]{article}
 
@@ -124,27 +123,68 @@ limited when using the client.
 \section{Design}
 \label{sec:design}
 \appname is, in essence, an encrypted file system built on
-Dropbox. Its main components are as follows:
-\par {\bf File System:} 
-\par {\bf Encryption:} 
-\par {\bf Key Storage:}  
+Dropbox. Its components are as follows:
+\par {\bf File System:} The file system is the main component of 
+\appnameWOspace. It mounts on the users home computer and handles 
+all interactions with Dropbox. The file system controls when
+encryption/decryption and key storage/retrieval occur.   
+\par {\bf Encryption:} Handles securely encrypting and decrypting file data
+given a secret key. 
+\par {\bf Key Storage:} Handles key storage, key retrieval, and user
+authentication so that the user may access their key. 
 
 \subsection{File System}
 \label{sec:fs}
-FUSE  Dropbox API
+*mounting file system as (opposed to webclient?)
+   transparency and usability
+   allows the user to control when fusebox is active
+*get dropbox oauth apriori
+   usability
+   convenient reuse
+*dropbox metadata
+   fetched in getattr
+   file obtained from dropbox in open
+       why this over read? over write?
+   enc/dec handled in read/write/create
+   file pushed to dropbox in release
+       why this over read? over write?
+
 
 \subsection{Encryption}
 \label{sec:enc}
-AES stream cipher
+Encryption is what differentiates \appname from just being a basic
+Dropbox client. The selection of a cryptographic algorithm, as well as
+any additional features of encryption, was a key design choice. What
+algorithm adheres best to the core goals of \appnameWOspace? Based on
+this criteria, I choose an AES stream cipher over an AES block cipher. 
+\par A stream cipher is ideal for \appname because it has better
+performance for random access \cite{exampleref1}. Since the AES block 
+cipher relies on a feedback loop, it must always decrypt and encrypt
+the whole file at a time. \appname seeks to provide consistent
+performance for files large and small. A block cipher would create
+too large a latency.   
+\par The other primary goal of \appname is transparency. This means
+file sizes should not indicate data is being encrypted. In order to
+accomplish this I decided to store the unencrypted file size in the
+metadata of the file. 
 
 \subsection{Key Storage}
 \label{sec:keystorage}
-\custos
+\custos provides this
+
+personal metadata to store information to retrieve key
+  other options included embedding at the front of the file
+   this is a bad idea because we needed flexible metadata size
+
+key sharing allows for all the awesome dropbox features 
 
 \section{Implementation}
 \label{sec:implementation}
 
 How did I accomplish the design?
+FUSE
+Dropbox API
+\custos
 
 \section{Conclusion}
 \label{sec:conclusion}
