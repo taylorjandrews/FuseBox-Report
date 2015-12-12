@@ -36,9 +36,12 @@
 \clubpenalty = 10000
 \widowpenalty = 10000
 
-% Variable
-\newcommand{\appname}{Custos FuseBox }
-\newcommand{\appnameWOspace}{Custos FuseBox}
+% Variables
+\newcommand{\appname}{FuseBox }
+\newcommand{\appnameWOspace}{FuseBox}
+
+\newcommand{\custos}{Tutamen }
+\newcommand{\custosWOspace}{Tutamen}
 
 % Start
 \begin{document}
@@ -56,7 +59,7 @@ However, in the face of social engineering attacks and other more technical
 exploits, it can be on the user to go the extra step to make sure
 their data is safe. Safety, however, should not come at the cost of
 sharing data between trusted people and devices. Take Dropbox for
-example CITATION?. It supports many sharing features, so users can't just
+example \cite{exampleref1}. It supports many sharing features, so users can't just
 encrypt and decrypt their files on a single computer. A more robust,
 and shareable, way to encrypt files is needed. 
 \appname aims to be a solution to this problem by providing a
@@ -82,47 +85,66 @@ with trusted partners. Cloud-based products, like Dropbox, are built
 on the ability to share and transfer data. How can users protect their
 data while still being able to normally use Dropbox? 
 \par Fortunately, part of the solution to this problem already exits.
-Custos, a SSaaS, provides a flexible means of storing and
-retrieving secrets CITATION?. The SSaaS model supports the features of
-Dropbox that \appname needs to interact with. Leveraging Custos allows \appname to 
+\custosWOspace, a ``Secret Storage as a Service'' (SSaaS), 
+provides a flexible means of storing and
+retrieving secrets \cite{exampleref1}. The SSaaS model supports the features of
+Dropbox that \appname needs to interact with. Leveraging \custos allows \appname to 
 authenticate in conjunction with cloud based services. The user's
 identity can be confirmed, and the appropriate key retrieved, on any number
-of platforms. 
+of platforms. In addition, \custos provides the user with the 
+flexibility to choose how they want to authenticate themselves. 
 \par Getting a key in this manner relieves the problems associated
 with using the cloud. The user's data, however, still needs to be
 protected. \appname aims to accomplish this as transparently as
 possible. To the end user, it appears that they are just normally
 interacting with their Dropbox. They can read, write, and create
 files. These files, from the perspective of Dropbox, are actually
-encrypted. If Dropbox is compromised data that passes through \appname
+encrypted. If Dropbox is somehow compromised, data that passes through \appname
 will not be.    
 
 \subsection{Goals}
 \label{sec:goals}
-\appname was created to be a simple and transparent security
-measure. Easy to setup, easy to use.
+\appname was created with two primary goals: transparency and consistency. 
 \par {\bf Transparency:} Dropbox is a very convenient application to
 use. Put files in, get files out. The existing desktop application
-allows for seamlessly uploading and downloading files CITATION?. The end user
+allows for seamlessly uploading and downloading files \cite{exampleref1}. The end user
 gets to take advantage of all the nice features of Dropbox at little
 to no effort on their end. \appname is built to keep this same 
-seamless feel while preserving the features of Dropbox. meanwhile behind the
+seamless feel while preserving the features of Dropbox. Meanwhile behind the
 scenes encryption, decryption, and authentication work together to
 secure the data.     
-\par {\bf Simplicity:} 
+\par {\bf Consistency:} \appnameWOspace's performance is bound by
+the speed of internet because it must connect to Dropbox. 
+\appname does not seek to overcome this
+limitation. Rather, regardless of file type or file size, the client
+is designed to perform equally well. Larger files should not create
+massive latency when using \appnameWOspace. This means the user is not
+limited when using the client.    
 
 \section{Design}
 \label{sec:design}
+\appname is, in essence, an encrypted file system built on
+Dropbox. Its main components are as follows:
+\par {\bf File System:} 
+\par {\bf Encryption:} 
+\par {\bf Key Storage:}  
 
-FUSE, Dropbox API, Custos etc.
+\subsection{File System}
+\label{sec:fs}
+FUSE  Dropbox API
+
+\subsection{Encryption}
+\label{sec:enc}
+AES stream cipher
+
+\subsection{Key Storage}
+\label{sec:keystorage}
+this is \custos
 
 \section{Implementation}
 \label{sec:implementation}
 
 How did I accomplish the design?
-
-%\section{Evaluation}
-%\label{sec:eval}
 
 \section{Conclusion}
 \label{sec:conclusion}
