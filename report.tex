@@ -157,10 +157,11 @@ file system reads the attributes of the file. Others were less so.
 \par The relevant file system operations are read, write, open, and
 release. The decision boils down to whether files are downloaded in
 open or read, and whether they are uploaded in write or create. The
-current implementation is simpler. It downloads in open and uploads in
+current implementation is simpler. It downloads the whole files in open and uploads in
 release. In the future, I would like to move the design to download in
 read and upload in write. This allows for an approach more geared at
-streaming files. 
+streaming files, since the file system can download on the section of the file that
+needs to be read. 
 
 \subsection{Encryption}
 \label{sec:enc}
