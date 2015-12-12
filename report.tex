@@ -156,7 +156,8 @@ Encryption is what differentiates \appname from just being a basic
 Dropbox client. The selection of a cryptographic algorithm, as well as
 any additional features of encryption, was a key design choice. What
 algorithm adheres best to the core goals of \appnameWOspace? Based on
-this criteria, I choose an AES stream cipher over an AES block cipher. 
+this criteria, I choose an AES stream cipher over an AES block
+cipher. More specifically, AES in CTR mode.  
 \par A stream cipher is ideal for \appname because it has better
 performance for random access \cite{exampleref1}. Since the AES block 
 cipher relies on a feedback loop, it must always decrypt and encrypt
@@ -170,13 +171,25 @@ metadata of the file.
 
 \subsection{Key Storage}
 \label{sec:keystorage}
-\custos provides this
-
-personal metadata to store information to retrieve key
-  other options included embedding at the front of the file
-   this is a bad idea because we needed flexible metadata size
-
-key sharing allows for all the awesome dropbox features 
+Key storage and retrieval is a critical feature of \appnameWOspace. 
+Encryption and decryption could be accomplished on a single users
+computer with their private key. This, however, restricts many of the
+functionalities of Dropbox. Using \custos keys are shared, and thus 
+sharing features can be utilized. The main design choice for \appname
+concerns how to integrate key storage.  
+\par Metadata is required to interact with \custosWOspace. This
+metadata could be stored either within the file itself, or else in a
+separate metadata file. Also, it could either be a fixed size or a
+variable size. Fixed sized metadata can be quickly discarded. Though
+it is simple, since metadata in \appname is not all the same size,
+determining a fixed size would be difficult. It also doesn't allow for
+easy future expansion of metadata if necessary. 
+\par Storing variable sized metadata within the file itself has its
+own problems. The complexity of implementation increases. To avoid
+this complexity I decided to store metadata in an external file. This
+file contains all the information needed to access \custosWOspace. It
+is flexible to any future expansions of metadata. 
+To preserve transparency the metadata files are hidden. 
 
 \section{Implementation}
 \label{sec:implementation}
