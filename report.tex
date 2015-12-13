@@ -212,9 +212,20 @@ are the primary components. Source code for \appname is available at~\cite{FuseB
 
 \subsection{File System}
 \label{sec:fsimp}
-The two main aspects of the file system are FUSE and the Dropbox
+The two main aspects of the file system are FUSE and the Dropbox Core
 API. FUSE, or File System in Userspace, allows for implementation of a
-full file system inside an userspace program~\cite{fuse}.
+full file system inside an userspace program~\cite{fuse}. The Dropbox
+API allows for communication between the host computer and Dropbox
+files~\cite{dropboxcore}.
+\par FUSE is an ideal backbone for an encrypted file system. It allows
+for non-privileged users to mount and unmount \appnameWOspace. At the
+moment, \appname doesn't make full use of all the functionality FUSE
+offers. For example, file permissions. This, however, could be expanded in the future. 
+\par The Dropbox Core API v1 was chosen over the Sync API or Datastore
+API because it provides the appropriate interactions with a single
+user's Dropbox. For \appnameWOspace, the API is used within FUSE
+calls. This is how doing normal file operations is able to connect
+with Dropbox. 
 
 \subsection{Encryption}
 \label{sec:encimp}
@@ -231,15 +242,31 @@ file, which holds the number of padding bytes.
 
 \subsection{Key Storage}
 \label{sec:ksimp}
-\custos
+Key storage and retrieval is provided
+by \custosWOspace~\cite{Pytutamen}. \appname interacts with two aspects
+of \custosWOspace, collections and secrets. In the current version
+of \appnameWOspace, collections and secrets are a one-to-one
+relationship with files. Thus, every files stores metadata containing
+both a collection uuid and a secret uuid. 
+\par One key per file allows for sharing to be as granular as
+possible. That way the user can select exactly what they would like to share.
+At the moment, the one-to-one relationship is simple. In the future, \appname
+could be expanded to have multiple keys per file. This allows for
+finer user control as one key could be more strict with it's
+authentication measures and another less so.   
 
 \section{Conclusion}
 \label{sec:conclusion}
-
-Where do we go from here?
-
-\noindent
-make a paragraph without indenting!
+\appname provides value by being more than just an encrypted file
+system. It allows for secure sharing between people and work stations.
+Users don't have to sacrifice security for sharing, nor sharing for
+security. 
+\par However, \appname is still incomplete. In the future, optimizations
+could be made to increase consistency of performance. These include
+file streaming for random access. The libraries and APIs \appname is
+built on could afford to be updated. Dropbox, for example, has recently released an
+updated version of their API. I look forward to continuing and
+improving the \appname project.    
 
 \bibliographystyle{acm}
 \bibliography{refs}
