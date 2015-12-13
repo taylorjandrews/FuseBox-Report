@@ -206,10 +206,31 @@ To preserve transparency the metadata files are hidden.
 
 \section{Implementation}
 \label{sec:implementation}
+The implementation of \appname approximately follows the key aspects
+of its design. That is, the file system, encryption, and key storage
+are the primary components. Source code for \appname is available at~\cite{FuseBox}.
 
-How did I accomplish the design?
-FUSE
-Dropbox API
+\subsection{File System}
+\label{sec:fsimp}
+The two main aspects of the file system are FUSE and the Dropbox
+API. FUSE, or File System in Userspace, allows for implementation of a
+full file system inside an userspace program~\cite{fuse}.
+
+\subsection{Encryption}
+\label{sec:encimp}
+As previously discussed, \appnameWOspace's encryption and decryption
+is AES in CTR mode. This is accomplished using PyCrypto~\cite{pycrypto}.
+PyCrypto was chosen because it provides support for the less
+frequently used CTR
+mode. It also has important features like implementing a nonce to
+randomize the counter. 
+\par One downside to this library was that, despite using CTR mode,
+encryption blocks had to be padded out to the AES Block Size. This was
+accomplished simply by padding with zeroes until the last byte of the
+file, which holds the number of padding bytes.  
+
+\subsection{Key Storage}
+\label{sec:ksimp}
 \custos
 
 \section{Conclusion}
