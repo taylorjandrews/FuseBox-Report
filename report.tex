@@ -58,13 +58,13 @@ However, in the face of social engineering attacks and other more technical
 exploits, it can be on the user to go the extra step to make sure
 their data is safe. Safety, however, should not come at the cost of
 sharing data between trusted people and devices. Take Dropbox for
-example~\cite{dropbox}. It supports many sharing features, so users can't just
-encrypt and decrypt their files on a single computer. A more robust,
+example~\cite{dropbox}. It supports many sharing features which don't
+integrate well with traditional single user keys. A more robust,
 and shareable, way to encrypt files is needed. 
 \appname aims to be a solution to this problem by providing a
-transparent layer of security between the end user and Dropbox. Files
-that pass through \appname are encrypted when uploaded to Dropbox. 
-Encryption, decryption, and authentication are all supported by \appnameWOspace.
+transparent layer of security between the end user and Dropbox.
+Combining authentication with encryption and decryption, \appname
+expands on the basic Dropbox file system.  
 %Shareability is provided using Custos, a ``Secret Storage as a Service''
 %(SSaaS) platform CITATION?. Custos allows for key sharing amongst
 %people and computers. 
@@ -75,18 +75,17 @@ future goals for the project.
 
 \section{Introduction}
 \label{sec:intro}
-Unsecured data is a gamble, a risk. No one wants to think that
-they could be the target of an attack. The idea of keeping things safe
-is nothing complicated. However, to the layman, the intricacies of
-actually protecting data are somewhat out of reach. This problem
+The idea of keeping things safe from prying eyes is nothing complicated.
+However, to the layman, the intricacies of
+actually protecting data online are somewhat out of reach. This problem
 becomes compounded when a single person wants to safely share data
 with trusted partners. Cloud-based products, like Dropbox, are built
 on the ability to share and transfer data. How can users protect their
-data while still being able to normally use Dropbox? 
+files while still being able to normally use Dropbox? 
 \par Fortunately, part of the solution to this problem already exits.
 \custosWOspace, a ``Secret Storage as a Service'' (SSaaS), 
 provides a flexible means of storing and
-retrieving secrets~\cite{custostrios}. The SSaaS model supports the features of
+retrieving secrets, in this case, keys~\cite{custostrios}. The SSaaS model supports the features of
 Dropbox that \appname needs to interact with. Leveraging \custos allows \appname to 
 authenticate in conjunction with cloud based services. The user's
 identity can be confirmed, and the appropriate key retrieved, on any number
@@ -157,15 +156,16 @@ file system reads the attributes of the file. Others were less so.
 \par The relevant file system operations are read, write, open, and
 release. The decision boils down to whether files are downloaded in
 open or read, and whether they are uploaded in write or create. The
-current implementation is simpler. It downloads the whole files in open and uploads in
+current implementation is simpler. It downloads the whole files in
+open and uploads it in
 release. In the future, I would like to move the design to download in
 read and upload in write. This allows for an approach more geared at
-streaming files, since the file system can download on the section of the file that
+streaming files, since the file system can download only the section of the file that
 needs to be read. 
 
 \subsection{Encryption}
 \label{sec:enc}
-Encryption is what differentiates \appname from just being a basic
+Encryption is part what differentiates \appname from just being a basic
 Dropbox client. The selection of a cryptographic algorithm, as well as
 any additional features of encryption, was a key design choice. What
 algorithm adheres best to the core goals of \appnameWOspace? Based on
@@ -176,7 +176,7 @@ performance for random access. Since the AES block
 cipher relies on a feedback loop, it must always decrypt and encrypt
 the whole file at a time. \appname seeks to provide consistent
 performance for files large and small. A block cipher would create
-too large a latency.   
+too large a latency for big pieces of data.   
 \par The other primary goal of \appname is transparency. This means
 file sizes should not indicate data is being encrypted. In order to
 accomplish this I decided to store the unencrypted file size in the
@@ -230,7 +230,8 @@ with Dropbox.
 \subsection{Encryption}
 \label{sec:encimp}
 As previously discussed, \appnameWOspace's encryption and decryption
-is AES in CTR mode. This is accomplished using PyCrypto~\cite{pycrypto}.
+is done by AES in CTR mode. This is accomplished using the  PyCrypto
+library~\cite{pycrypto}.
 PyCrypto was chosen because it provides support for the less
 frequently used CTR
 mode. It also has important features like implementing a nonce to
