@@ -174,7 +174,6 @@ Noteworthy is that \appname is always fetching metadata on the fly
 from Dropbox. This sacrifices offline capability, such as in the
 default Dropbox client, for an on-demand approach that requires less
 local memory. 
-
 \par Once metadata is obtained in getattr, the relevant file system 
 operations are read, write, open, and
 release. The decision boils down to whether files are downloaded in open and
@@ -229,35 +228,38 @@ data is being encrypted. Only the unencrypted file size should be
 visible to the end user. In order to
 accomplish this I decided to store the unencrypted file size in the
 metadata of the file. 
-\par Currently, \appname does not implement any
+\par Currently, \appname does not implement any file
 authentication. However, I intend to add it in the future. Authentication is
 valuable because it determines all parties are who they claim to
 be. Much like encryption and decryption, authentication should be
 decoupled from the main VFS. That way, updates and changes 
-can occur without perturbing the main \appname infrastructure. The
-means of authentication would be a message authentication code (MAC).  
+can occur without perturbing the main \appname infrastructure. 
 
 \subsection{SSaaS Key Management}
 \label{sec:keystorage}
 Key storage and retrieval is a critical feature of \appnameWOspace. 
 Encryption and decryption could be accomplished on a single users
-computer with their private key. This, however, restricts many of the
-functionalities of Dropbox. Using \custos keys are shared, and thus 
-sharing features can be utilized. The main design choice for \appname
+computer with a locally stored key. This, however, restricts many of the
+functionalities of Dropbox. It's also less secure, given someone could
+steal a computer and gain access to its local keys.
+Using \custos keys can be shared, and thus 
+sharing features can be utilized. Keys are also more secure as they
+are protected by authentication measures. For example passwords.  
+The main design choice for \appname
 concerns how to integrate key storage.  
-\par Metadata is required to interact with \custosWOspace. This
-metadata could be stored either within the file itself, or else in a
+\par Metadata is required to map keys to files in \custosWOspace. This
+metadata could be stored either within the file itself, or in a
 separate metadata file. Also, it could either be a fixed size or a
 variable size. Fixed sized metadata can be quickly discarded. Though
-it is simple, since metadata in \appname is not all the same size,
+fixed size designs are simpler, since metadata in \appname is not all the same size,
 determining a fixed size would be difficult. It also doesn't allow for
 easy future expansion of metadata if necessary. 
 \par Storing variable sized metadata within the file itself has its
 own problems. The complexity of implementation increases. To avoid
-this complexity I decided to store metadata in an external file. This
+this complexity I decided to store metadata in an separate file. This
 file contains all the information needed to access \custosWOspace. It
 is flexible to any future expansions of metadata. 
-To preserve transparency the metadata files are hidden. 
+To preserve transparency the metadata files are hidden from the user. 
 
 \section{Implementation}
 \label{sec:implementation}
@@ -276,12 +278,24 @@ files~\cite{dropboxcore}.
 \par FUSE is an ideal backbone for an encrypted, layered file system. It allows
 for non-privileged users to mount and unmount \appnameWOspace. At the
 moment, \appname doesn't make full use of all the functionality FUSE
-offers. For example, file permissions. This, however, could be expanded in the future. 
+offers. For example, file permissions. This, however, could be
+expanded in the future. 
+\par Though the main FUSE library is C-based, I chose to use python
+instead. The specific binding is
+fuse-python~\cite{fuse-python}. However, fuse-python has not recently
+been updated to reflect changing python standards.
+In the future, \appname could increase it's longevity by moving to a FUSE library
+that supports python 3 rather than python 2.
 \par The Dropbox Core API v1 was chosen over the Sync API~\cite{dropboxsync} or Datastore
 API~\cite{dropboxdatastore} because it provides the appropriate interactions with a single
-user's Dropbox. For \appnameWOspace, the API is used within FUSE
+user's Dropbox. Dropbox offers several languages for
+implementation. Python was the logical choice because that language is
+the one I used for FUSE. For \appnameWOspace, the python API is used within FUSE
 calls. This is how doing normal file operations is able to connect
-with Dropbox. 
+with Dropbox. For example, FUSE function {\em open} utilizes the API
+function {\em get\textunderscore file}, and {\em release} utilizes {\em
+  put\textunderscore file}. This reflects
+the design choice of where to download and upload files.
 
 \subsection{Cryptography}
 \label{sec:encimp}
@@ -293,9 +307,23 @@ frequently used CTR
 mode. It also has important features like implementing a nonce to
 randomize the counter. 
 \par One downside to this library was that, despite using CTR mode,
-encryption blocks had to be padded out to the AES Block Size. This was
-accomplished simply by padding with zeroes until the last byte of the
-file, which holds the number of padding bytes.  
+encryption blocks had to be padded out to the AES block size. Because
+of this, the VFS must be able to translate between the unencrypted and
+encrypted file sizes. Without being able to translate, \appname would
+lose transparency since encrypted file sizes would be visible. 
+\par First, to pad out the block, \appname determines the number of
+padding bytes required. Then, it converts this number directly to a
+character using ASCII. That character is then appended to the file
+until the correct size is reached. To reverse the padding, the last
+byte of the file is examined. The character there is converted into
+its ASCII numbering and that many bytes are then stripped from the
+file. 
+\par In the future, \appname will support file authentication. This
+can be done using an message authentication code (MAC). The MAC can be
+computed using a hash function, giving it the name HMAC. \appname
+would implement file authentication within encryption and
+decryption. The MAC would be updated in encrypted and checked in
+decrypt. 
 
 \subsection{SSaaS Key Management}
 \label{sec:ksimp}
@@ -304,11 +332,12 @@ by \custosWOspace~\cite{Pytutamen}. \appname interacts with two aspects
 of \custosWOspace, collections and secrets. In the current version
 of \appnameWOspace, collections and secrets are a one-to-one
 relationship with files. Thus, every files stores metadata containing
-both a collection uuid and a secret uuid. It also contains, as
-mentioned above, the encrypted file size.
-
-\texttt{this is the metadata format}
-
+both a collection uuid and a secret uuid, e.g. one key per file. It also contains, as
+mentioned above, the encrypted file size. See example metadata below:
+\begin{center}
+\noindent\texttt{\{``cuuid'':<cuuid>, ``suuid'':<suuid>, ``size'':0\}}
+\hspace{\columnwidth}
+\end{center}
 \par One key per file allows for sharing to be as granular as
 possible. That way the user can select exactly what they would like to share.
 At the moment, the one-to-one relationship is simple. In the future, \appname
