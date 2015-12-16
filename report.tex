@@ -109,9 +109,16 @@ ensures that from the perspective of Dropbox files are encrypted.
 If Dropbox is somehow compromised, data that passes through \appname
 will not be.    
 
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\columnwidth]{./figs/pdf/FuseBox.pdf}
+  \caption{FuseBox Overview}
+  \label{fig:fusebox}
+\end{figure}
+
 \subsection{Goals}
 \label{sec:goals}
-\appname was created with two primary goals: transparency and
+\appname (Figure~\ref{fig:fusebox}) was created with two primary goals: transparency and
 on-demand performance. 
 \par {\bf Transparent:} Dropbox is a very convenient application to
 use. Put files in, get files out. The existing desktop application
@@ -340,10 +347,10 @@ mentioned above, the encrypted file size. See example metadata below:
 \end{center}
 \par One key per file allows for sharing to be as granular as
 possible. That way the user can select exactly what they would like to share.
-At the moment, the one-to-one relationship is simple. In the future, \appname
-could be expanded to have multiple keys per file. This allows for
-finer user control as one key could be more strict with it's
-authentication measures and another less so.   
+Because \custos maintains access control at the collections level, grouping multiple
+files into a single collection would mean a loss of granularity. In
+the future, \appname could support multiple files per collection in
+case the user desires to simplify management. 
 
 \section{Conclusion}
 \label{sec:conclusion}

@@ -7,7 +7,7 @@ TEX = $(wildcard *.tex)
 SRCS = $(TEX) refs.bib
 
 FIG_TMP = tmp.eps
-FIGS = $(patsubst %, figs/pdf/%.pdf, examplefig1)
+FIGS = $(patsubst %, figs/pdf/%.pdf, FuseBox)
 
 all: pdf
 
