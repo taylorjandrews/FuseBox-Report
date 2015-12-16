@@ -52,10 +52,10 @@
 \maketitle
 
 \begin{abstract}
-In the age of the cloud security is an ever evolving problem. 
+In the age of cloud computing, security is an ever evolving problem. 
 Services are doing their very best to protect sensitive data. 
 However, in the face of malicious hacking, it can be on the user to go the extra step to make sure
-their data is safe. Safety, however, should not come at the cost of
+their data is safe. Safety should not come at the cost of
 sharing data between trusted people and devices. Take Dropbox for
 example~\cite{dropbox}. 
 It supports many sharing features. But traditional keys are for single
@@ -64,7 +64,7 @@ copying. Thus, they do not integrate well with Dropbox.
 A more robust,
 and shareable, way to encrypt files is needed. 
 \appname aims to solve this problem by providing a
-transparent layer of security between the end user and Dropbox
+transparent layer of security between the end user and Dropbox,
 without breaking the core Dropbox use cases.
 Combining authentication with encryption and decryption, \appname
 expands on the basic Dropbox file system.  
@@ -137,7 +137,7 @@ larger files don't create additional latency because of their
 size. It also means that files are only downloaded when they are requested
 by the user, and local copies of files aren't retained. This different 
 than the default Dropbox client which
-creates local copies of all files upon installation. 
+creates local copies of all files. 
 
 \section{Design}
 \label{sec:design}
@@ -148,7 +148,7 @@ Dropbox. Its components are as follows:
 all interactions with Dropbox. The VFS controls when
 encryption/decryption and key storage/retrieval occur.   
 \par {\bf Cryptography:} Handles securely encrypting and decrypting file data
-given a secret key. Also handles authenticating users. 
+given a secret key. Also handles authenticating files. 
 \par {\bf SSaaS Key Management:} Handles key storage, key retrieval, and user
 authentication so that the user may access and share their keys. 
 
@@ -186,7 +186,7 @@ operations are read, write, open, and
 release. The decision boils down to whether files are downloaded in open and
 uploaded in release, or if they are downloaded and uploaded as needed
 in the relevant read and write operations.
-In open the VFS does not yet know how large the requested read from or
+In open, the VFS does not yet know how large the requested read from or
 write to the specified file is. Therefore if the file is downloaded in
 open it must be the entire file. Likewise, if the file is uploaded in
 in release it must be the entire file since the length of any previous
@@ -201,13 +201,13 @@ The current iteration of
 uploading in release. Future iterations of \appname will move towards
 the other more efficient and less resource-consuming method.  
 \par Again, it is noteworthy that regardless where communication with
-Dropbox occurs \appname will
+Dropbox occurs, \appname will
 always retain its on-demand approach of downloading and uploading
 files only as needed. 
 
 \subsection{Cryptography}
 \label{sec:enc}
-Encryption is part what differentiates \appname from just being a basic
+Encryption is part what differentiates \appname from being a basic
 Dropbox client. The selection of a cryptographic algorithm,
 any additional features of encryption, and authentication were key design choices. What
 algorithm adheres best to the core goals of \appnameWOspace? Based on
@@ -217,7 +217,7 @@ CBC mode~\cite{CBC}. AES was selected because it is a standard cipher.
 Part of the design of \appname is
 flexibility in cipher. By abstracting away the actual algorithm used,
 \appname can easily update to different ciphers. The file system
-simply calls encrypt or decrypt while the underlying cryptographic
+simply calls encrypt or decrypt, while the underlying cryptographic
 implementation does the work. This ensures \appname can accommodate 
 future changes and advances in cryptography. 
 \par AES CTR mode is ideal for \appname because it has better
@@ -227,8 +227,8 @@ the whole file at a time. \appname seeks to provide consistent
 performance for files large and small. CBC mode would create
 too large a latency for big pieces of data.   
 \par The other primary goal of \appname is transparency. To have
-transparency, the end user should be aware of the encryption going on
-behind the scenes when they use \appname. This means that file read
+transparency, the end user should not be able to see the encryption going on
+behind the scenes when they use \appnameWOspace. This means that file read
 operations should never show encrypted data. The same holds true for
 any write operations. Furthermore, file sizes should not indicate 
 data is being encrypted. Only the unencrypted file size should be
@@ -247,7 +247,8 @@ can occur without perturbing the main \appname infrastructure.
 Key storage and retrieval is a critical feature of \appnameWOspace. 
 Encryption and decryption could be accomplished on a single users
 computer with a locally stored key. This, however, restricts many of the
-functionalities of Dropbox. It's also less secure, given someone could
+functionalities of Dropbox since keys must be copied to be used on
+other machines. It's also less secure, given someone could
 steal a computer and gain access to its local keys.
 Using \custos keys can be shared, and thus 
 sharing features can be utilized. Keys are also more secure as they
@@ -256,14 +257,17 @@ The main design choice for \appname
 concerns how to integrate key storage.  
 \par Metadata is required to map keys to files in \custosWOspace. This
 metadata could be stored either within the file itself, or in a
-separate metadata file. Also, it could either be a fixed size or a
+separate metadata file. Also, the metadata could either be a fixed size or a
 variable size. Fixed sized metadata can be quickly discarded. Though
 fixed size designs are simpler, since metadata in \appname is not all the same size,
 determining a fixed size would be difficult. It also doesn't allow for
 easy future expansion of metadata if necessary. 
 \par Storing variable sized metadata within the file itself has its
-own problems. The complexity of implementation increases. To avoid
-this complexity I decided to store metadata in an separate file. This
+own problems. The implementation is more complex because the length of the
+metadata must somehow be indicated. Allotting the first few bits of the
+file to indicate metadata size could work, but how many bits to
+allocate? What if the size of the metadata needs to expand?
+To avoid this complexity I decided to store metadata in an separate file. This
 file contains all the information needed to access \custosWOspace. It
 is flexible to any future expansions of metadata. 
 To preserve transparency the metadata files are hidden from the user. 
@@ -287,17 +291,17 @@ for non-privileged users to mount and unmount \appnameWOspace. At the
 moment, \appname doesn't make full use of all the functionality FUSE
 offers. For example, file permissions. This, however, could be
 expanded in the future. 
-\par Though the main FUSE library is C-based, I chose to use python
+\par Though the main FUSE library is C-based, I chose to use Python
 instead. The specific binding is
-fuse-python~\cite{fuse-python}. However, fuse-python has not recently
-been updated to reflect changing python standards.
+fuse-python~\cite{fuse-python}. However, fuse-python has not
+been updated to reflect changing Python standards.
 In the future, \appname could increase it's longevity by moving to a FUSE library
-that supports python 3 rather than python 2.
+that supports Python 3 rather than Python 2.
 \par The Dropbox Core API v1 was chosen over the Sync API~\cite{dropboxsync} or Datastore
 API~\cite{dropboxdatastore} because it provides the appropriate interactions with a single
 user's Dropbox. Dropbox offers several languages for
 implementation. Python was the logical choice because that language is
-the one I used for FUSE. For \appnameWOspace, the python API is used within FUSE
+the one I used for FUSE. In \appnameWOspace, the Python API is used within FUSE
 calls. This is how doing normal file operations is able to connect
 with Dropbox. For example, FUSE function {\em open} utilizes the API
 function {\em get\textunderscore file}, and {\em release} utilizes {\em
