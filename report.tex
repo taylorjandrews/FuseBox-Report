@@ -52,17 +52,20 @@
 \maketitle
 
 \begin{abstract}
-Security in the digital age is an ever evolving problem.
+In the age of the cloud security is an ever evolving problem. 
 Services are doing their very best to protect sensitive data. 
-However, in the face of social engineering attacks and other more technical
-exploits, it can be on the user to go the extra step to make sure
+However, in the face of malicious hacking, it can be on the user to go the extra step to make sure
 their data is safe. Safety, however, should not come at the cost of
 sharing data between trusted people and devices. Take Dropbox for
-example~\cite{dropbox}. It supports many sharing features which don't
-integrate well with traditional single user keys. A more robust,
+example~\cite{dropbox}. 
+It supports many sharing features. But traditional keys are for single
+users, and can only be transfered to other machines via
+copying. Thus, they do not integrate well with Dropbox. 
+A more robust,
 and shareable, way to encrypt files is needed. 
-\appname aims to be a solution to this problem by providing a
-transparent layer of security between the end user and Dropbox.
+\appname aims to solve this problem by providing a
+transparent layer of security between the end user and Dropbox
+without breaking the core Dropbox use cases.
 Combining authentication with encryption and decryption, \appname
 expands on the basic Dropbox file system.  
 %Shareability is provided using Custos, a ``Secret Storage as a Service''
@@ -75,17 +78,20 @@ future goals for the project.
 
 \section{Introduction}
 \label{sec:intro}
-The idea of keeping things safe from prying eyes is nothing complicated.
-However, to the layman, the intricacies of
-actually protecting data online are somewhat out of reach. This problem
+The idea of keeping things safe from prying eyes is nothing new.
+To the layman, the intricacies of
+actually protecting data online are often out of reach. This problem
 becomes compounded when a single person wants to safely share data
-with trusted partners. Cloud-based products, like Dropbox, are built
-on the ability to share and transfer data. How can users protect their
-files while still being able to normally use Dropbox? 
+with trusted partners, or store data across multiple devices.
+Cloud-based products, like Dropbox, are built
+on the ability to share and synch data. How can users protect their
+files while still being able to use Dropbox as they normally would? 
 \par Fortunately, part of the solution to this problem already exits.
-\custosWOspace, a ``Secret Storage as a Service'' (SSaaS), 
+\custosWOspace, a ``Secret Storage as a Service'' (SSaaS) platform, 
 provides a flexible means of storing and
-retrieving secrets, in this case, keys~\cite{custostrios}. The SSaaS model supports the features of
+retrieving secrets, in this case, cryptographic
+keys~\cite{custostrios}. 
+The SSaaS model supports the features of
 Dropbox that \appname needs to interact with. Leveraging \custos allows \appname to 
 authenticate in conjunction with cloud based services. The user's
 identity can be confirmed, and the appropriate key retrieved, on any number
