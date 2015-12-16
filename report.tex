@@ -185,36 +185,59 @@ write to the specified file is. Therefore if the file is downloaded in
 open it must be the entire file. Likewise, if the file is uploaded in
 in release it must be the entire file since the length of any previous
 write operations is unknown. 
+\par Though downloading in open and uploading
+in release is simpler, since the amount of the file that will actually
+be used is unknown, this approach sacrifices performance. Small read
+operations on large files will take longer. Furthermore, local memory
+will be taken up by unnecessary sections of files.  
+The current iteration of
+\appname goes for the simpler solution of downloading in open and
+uploading in release. Future iterations of \appname will move towards
+the other more efficient and less resource-consuming method.  
+\par Again, it is noteworthy that regardless where communication with
+Dropbox occurs \appname will
+always retain its on-demand approach of downloading and uploading
+files only as needed. 
 
-
-The
-current implementation is simpler. It downloads the whole files in
-open and uploads it in
-release. In the future, I would like to move the design to download in
-read and upload in write. This allows for an approach more geared at
-streaming files, since the file system can download only the section of the file that
-needs to be read. 
-
-\subsection{Encryption}
+\subsection{Cryptography}
 \label{sec:enc}
 Encryption is part what differentiates \appname from just being a basic
-Dropbox client. The selection of a cryptographic algorithm, as well as
-any additional features of encryption, was a key design choice. What
+Dropbox client. The selection of a cryptographic algorithm,
+any additional features of encryption, and authentication were key design choices. What
 algorithm adheres best to the core goals of \appnameWOspace? Based on
-this criteria, I choose an AES stream cipher over an AES block
-cipher. More specifically, AES in CTR mode~\cite{AESCTR}.  
-\par A stream cipher is ideal for \appname because it has better
-performance for random access. Since the AES block 
-cipher relies on a feedback loop, it must always decrypt and encrypt
+this criteria, I choose an AES in CTR mode~\cite{AESCTR} over AES in
+CBC mode~\cite{CBC}. AES was selected because it is a standard cipher. 
+\par However, \appname is not bound to any one cryptographic algorithm. 
+Part of the design of \appname is
+flexibility in cipher. By abstracting away the actual algorithm used,
+\appname can easily update to different ciphers. The file system
+simply calls encrypt or decrypt while the underlying cryptographic
+implementation does the work. This ensures \appname can accommodate 
+future changes and advances in cryptography. 
+\par AES CTR mode is ideal for \appname because it has better
+performance for random access. Since the AES in CBC mode relies on a 
+feedback loop, it must always decrypt and encrypt
 the whole file at a time. \appname seeks to provide consistent
-performance for files large and small. A block cipher would create
+performance for files large and small. CBC mode would create
 too large a latency for big pieces of data.   
-\par The other primary goal of \appname is transparency. This means
-file sizes should not indicate data is being encrypted. In order to
+\par The other primary goal of \appname is transparency. To have
+transparency, the end user should be aware of the encryption going on
+behind the scenes when they use \appname. This means that file read
+operations should never show encrypted data. The same holds true for
+any write operations. Furthermore, file sizes should not indicate 
+data is being encrypted. Only the unencrypted file size should be
+visible to the end user. In order to
 accomplish this I decided to store the unencrypted file size in the
 metadata of the file. 
+\par Currently, \appname does not implement any
+authentication. However, I intend to add it in the future. Authentication is
+valuable because it determines all parties are who they claim to
+be. Much like encryption and decryption, authentication should be
+decoupled from the main VFS. That way, updates and changes 
+can occur without perturbing the main \appname infrastructure. The
+means of authentication would be a message authentication code (MAC).  
 
-\subsection{Key Storage}
+\subsection{SSaaS Key Management}
 \label{sec:keystorage}
 Key storage and retrieval is a critical feature of \appnameWOspace. 
 Encryption and decryption could be accomplished on a single users
@@ -238,11 +261,12 @@ To preserve transparency the metadata files are hidden.
 
 \section{Implementation}
 \label{sec:implementation}
-The implementation of \appname approximately follows the key aspects
-of its design. That is, the file system, encryption, and key storage
+The implementation of \appname approximately follows from the key aspects
+of its design. That is, the virtual file system, cryptography, and
+SSaaS key management
 are the primary components. Source code for \appname is available at~\cite{FuseBox}.
 
-\subsection{File System}
+\subsection{Virtual File System}
 \label{sec:fsimp}
 The file system is built using FUSE and the Dropbox Core
 API. FUSE, or File System in Userspace, allows for implementation of a
@@ -259,7 +283,7 @@ user's Dropbox. For \appnameWOspace, the API is used within FUSE
 calls. This is how doing normal file operations is able to connect
 with Dropbox. 
 
-\subsection{Encryption}
+\subsection{Cryptography}
 \label{sec:encimp}
 As previously discussed, \appnameWOspace's encryption and decryption
 is done by AES in CTR mode. This is accomplished using the  PyCrypto
@@ -273,14 +297,18 @@ encryption blocks had to be padded out to the AES Block Size. This was
 accomplished simply by padding with zeroes until the last byte of the
 file, which holds the number of padding bytes.  
 
-\subsection{Key Storage}
+\subsection{SSaaS Key Management}
 \label{sec:ksimp}
 Key storage and retrieval is provided
 by \custosWOspace~\cite{Pytutamen}. \appname interacts with two aspects
 of \custosWOspace, collections and secrets. In the current version
 of \appnameWOspace, collections and secrets are a one-to-one
 relationship with files. Thus, every files stores metadata containing
-both a collection uuid and a secret uuid. 
+both a collection uuid and a secret uuid. It also contains, as
+mentioned above, the encrypted file size.
+
+\texttt{this is the metadata format}
+
 \par One key per file allows for sharing to be as granular as
 possible. That way the user can select exactly what they would like to share.
 At the moment, the one-to-one relationship is simple. In the future, \appname
@@ -290,10 +318,9 @@ authentication measures and another less so.
 
 \section{Conclusion}
 \label{sec:conclusion}
-\appname provides value by being more than just an encrypted file
-system. It allows for secure sharing between people and work stations.
-Users don't have to sacrifice security for sharing, nor sharing for
-security. 
+\appname provides value by being an encrypted file
+system that allows for secure sharing between people and devices.
+Users don't have to sacrifice security to take advantage of Dropbox. 
 \par However, \appname is still incomplete. In the future, optimizations
 could be made to increase consistency of performance. These include
 file streaming for random access. The libraries and APIs \appname is
