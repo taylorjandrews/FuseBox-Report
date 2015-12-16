@@ -84,7 +84,7 @@ actually protecting data online are often out of reach. This problem
 becomes compounded when a single person wants to safely share data
 with trusted partners, or store data across multiple devices.
 Cloud-based products, like Dropbox, are built
-on the ability to share and synch data. How can users protect their
+on the ability to share and sync data. How can users protect their
 files while still being able to use Dropbox as they normally would? 
 \par Fortunately, part of the solution to this problem already exits.
 \custosWOspace, a ``Secret Storage as a Service'' (SSaaS) platform, 
@@ -97,71 +97,97 @@ authenticate in conjunction with cloud based services. The user's
 identity can be confirmed, and the appropriate key retrieved, on any number
 of platforms. In addition, \custos provides the user with the 
 flexibility to choose how they want to authenticate themselves. 
-\par Getting a key in this manner relieves the problems associated
-with using the cloud. The user's data, however, still needs to be
-protected. \appname aims to accomplish this as transparently as
+\par Encryption and decryption on cloud-based systems is inhibited by
+the need to transfer and move cryptographic keys. Key sharing 
+with \custos means this problem is alleviated. However, this isn't the
+whole solution. The user's data still needs to be protected.
+\appname aims to accomplish this as transparently as
 possible. To the end user, it appears that they are just normally
-interacting with their Dropbox. They can read, write, and create
-files. These files, from the perspective of Dropbox, are actually
-encrypted. If Dropbox is somehow compromised, data that passes through \appname
+interacting with Dropbox. They can read, write, and create
+files. Meanwhile, client side encryption within \appname
+ensures that from the perspective of Dropbox files are encrypted.
+If Dropbox is somehow compromised, data that passes through \appname
 will not be.    
 
 \subsection{Goals}
 \label{sec:goals}
-\appname was created with two primary goals: transparency and consistency. 
-\par {\bf Transparency:} Dropbox is a very convenient application to
+\appname was created with two primary goals: transparency and
+on-demand performance. 
+\par {\bf Transparent:} Dropbox is a very convenient application to
 use. Put files in, get files out. The existing desktop application
 allows for seamlessly uploading and downloading files~\cite{dropboxclient}. The end user
 gets to take advantage of all the nice features of Dropbox at little
 to no effort on their end. \appname is built to keep this same 
-seamless feel while preserving the features of Dropbox. Meanwhile behind the
+seamless feel while adding additional security. Meanwhile behind the
 scenes encryption, decryption, and authentication work together to
 secure the data.     
-\par {\bf Consistency:} \appnameWOspace's performance is bound by
+\par {\bf On-Demand:} \appnameWOspace's performance is bound by
 the speed of internet because it must connect to Dropbox. 
 \appname does not seek to overcome this
 limitation. Rather, regardless of file type or file size, the client
-is designed to perform equally well. Larger files should not create
-massive latency when using \appnameWOspace. This means the user is not
-limited when using the client.    
+is designed to perform equally well. On-demand performance means that
+larger files don't create additional latency because of their
+size. It also means that files are only downloaded when they are requested
+by the user, and local copies of files aren't retained. This different 
+than the default Dropbox client which
+creates local copies of all files upon installation. 
 
 \section{Design}
 \label{sec:design}
-\appname is, in essence, an encrypted file system built on
+\appname is, in essence, an encrypted file system built atop
 Dropbox. Its components are as follows:
-\par {\bf File System:} The file system is the main component of 
+\par {\bf Virtual File System:} The virtual file system (VFS) is the main component of 
 \appnameWOspace. It mounts on the users home computer and handles 
-all interactions with Dropbox. The file system controls when
+all interactions with Dropbox. The VFS controls when
 encryption/decryption and key storage/retrieval occur.   
-\par {\bf Encryption:} Handles securely encrypting and decrypting file data
-given a secret key. 
-\par {\bf Key Storage:} Handles key storage, key retrieval, and user
-authentication so that the user may access their key. 
+\par {\bf Cryptography:} Handles securely encrypting and decrypting file data
+given a secret key. Also handles authenticating users. 
+\par {\bf SSaaS Key Management:} Handles key storage, key retrieval, and user
+authentication so that the user may access and share their keys. 
 
-\subsection{File System}
+\subsection{Virtual File System}
 \label{sec:fs}
-\appname is a transparent and consistent file system. The major design
-decisions for the file system include: how to mount the file system on
-the user's computer and when the interactions with Dropbox should
+\appname is a transparent and on-demand virtual file system. The major design
+decision for the VFS was when the interactions with Dropbox should
 occur. 
-\par Mounting the file system is a necessary step to connect the user
-with \appnameWOspace. I chose to give user control over when the file
-system is mounted and when it is not.  
-\par The file system connects to Dropbox via an oauth token. The user must
+%% \par Mounting the file system is a necessary step to connect the user
+%% with \appnameWOspace. I chose to give user control over when the file
+%% system is mounted and when it is not. 
+\par The file system authenticates to Dropbox via an oauth token. The user must
 generate this token with their account information. In order to make
 \appname more usable in the long-term, this oauth token need only be
-constructed by the user one time. Then, the file system, once mounted,
-just continues to use the specified oauth token until it expires or is
+requested by the user one time. Then the file system continues to
+use the specified oauth token until it expires or is
 revoked by the user. 
 \par Interaction with Dropbox is restricted to three simple
-operations: downloading a file, uploading a file, and reading Dropbox
-file metadata. The file system must use these operations in
-conjunction with normal file operations such as read and write. Some
-aspects of this were simple. The Dropbox metadata is obtained when the
-file system reads the attributes of the file. Others were less so.
-\par The relevant file system operations are read, write, open, and
-release. The decision boils down to whether files are downloaded in
-open or read, and whether they are uploaded in write or create. The
+operations: reading Dropbox file metadata, downloading a file, 
+and uploading a file. The file system must use these operations in
+conjunction with normal file operations such as read and write. 
+\par File metadata from Dropbox is needed within the VFS whenever it
+requires the attributes of a file. For example, when the user prints
+the contents of a directory. It wouldn't be enough to just obtain Dropbox
+metadata when opening a file, because cases like listing directory contents
+aren't opening files. The design solution is to fetch Dropbox metadata
+in a file system function whose purpose is to return file
+attributes. In the case of \appnameWOspace, this function is getattr. 
+Noteworthy is that \appname is always fetching metadata on the fly
+from Dropbox. This sacrifices offline capability, such as in the
+default Dropbox client, for an on-demand approach that requires less
+local memory. 
+
+\par Once metadata is obtained in getattr, the relevant file system 
+operations are read, write, open, and
+release. The decision boils down to whether files are downloaded in open and
+uploaded in release, or if they are downloaded and uploaded as needed
+in the relevant read and write operations.
+In open the VFS does not yet know how large the requested read from or
+write to the specified file is. Therefore if the file is downloaded in
+open it must be the entire file. Likewise, if the file is uploaded in
+in release it must be the entire file since the length of any previous
+write operations is unknown. 
+
+
+The
 current implementation is simpler. It downloads the whole files in
 open and uploads it in
 release. In the future, I would like to move the design to download in
@@ -218,17 +244,17 @@ are the primary components. Source code for \appname is available at~\cite{FuseB
 
 \subsection{File System}
 \label{sec:fsimp}
-The two main aspects of the file system are FUSE and the Dropbox Core
+The file system is built using FUSE and the Dropbox Core
 API. FUSE, or File System in Userspace, allows for implementation of a
 full file system inside an userspace program~\cite{fuse}. The Dropbox
 API allows for communication between the host computer and Dropbox
 files~\cite{dropboxcore}.
-\par FUSE is an ideal backbone for an encrypted file system. It allows
+\par FUSE is an ideal backbone for an encrypted, layered file system. It allows
 for non-privileged users to mount and unmount \appnameWOspace. At the
 moment, \appname doesn't make full use of all the functionality FUSE
 offers. For example, file permissions. This, however, could be expanded in the future. 
-\par The Dropbox Core API v1 was chosen over the Sync API or Datastore
-API because it provides the appropriate interactions with a single
+\par The Dropbox Core API v1 was chosen over the Sync API~\cite{dropboxsync} or Datastore
+API~\cite{dropboxdatastore} because it provides the appropriate interactions with a single
 user's Dropbox. For \appnameWOspace, the API is used within FUSE
 calls. This is how doing normal file operations is able to connect
 with Dropbox. 
